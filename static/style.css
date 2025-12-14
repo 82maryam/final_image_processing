@@ -1,0 +1,119 @@
+:root{
+  --bg:#0b1020;
+  --card:#111a33;
+  --muted:#98a2b3;
+  --text:#e6e8ee;
+  --accent:#7c5cff;
+  --accent2:#22c55e;
+  --border:rgba(255,255,255,.08);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;
+  background: radial-gradient(1200px 700px at 70% -10%, rgba(124,92,255,.35), transparent 60%),
+              radial-gradient(900px 600px at 10% 10%, rgba(34,197,94,.18), transparent 55%),
+              var(--bg);
+  color:var(--text);
+}
+
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px;
+}
+
+.header{
+  margin:8px 0 18px;
+  padding:18px 18px 8px;
+}
+.header h1{margin:0 0 8px; font-size:28px}
+.header p{margin:0; color:var(--muted)}
+
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  margin:14px 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+}
+@media (max-width: 880px){
+  .grid{grid-template-columns:1fr}
+}
+
+.lbl{display:block; margin-bottom:8px; color:var(--muted)}
+input[type="file"]{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px dashed var(--border);
+  background: rgba(0,0,0,.22);
+  color: var(--text);
+}
+
+.hint{display:block; margin-top:8px; color:var(--muted)}
+
+.actions{
+  margin-top:14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.btn{
+  border:0;
+  cursor:pointer;
+  background: linear-gradient(90deg, var(--accent), #4cc9f0);
+  color:#081024;
+  padding:12px 16px;
+  border-radius:12px;
+  font-weight:700;
+}
+.btn:disabled{opacity:.6; cursor:not-allowed}
+
+.status{color:var(--accent2); font-weight:700}
+
+.gallery{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap:12px;
+  margin-top:12px;
+}
+
+.imgCard{
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background: rgba(0,0,0,.18);
+}
+.imgTop{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+}
+.imgTitle{font-weight:800}
+.imgMeta{color:var(--muted); font-size:12px; margin-top:4px}
+.imgCard img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  display:block;
+}
+
+.empty{
+  color:var(--muted);
+  padding:10px;
+}
+
+.footer{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:12px;
+}

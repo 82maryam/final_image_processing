@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تشخیص چهره در ویدئوها</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <h1>تشخیص چهره + تطبیق با ویدئوی مرجع</h1>
+      <p>یک ویدئوی مرجع بده و یک پوشه ویدئوها—بعد بهترین چهره‌ها و مشابه‌ها نمایش داده میشن.</p>
+    </header>
+
+    <section class="card">
+      <div class="grid">
+        <div>
+          <label class="lbl">ویدئوی مرجع (MP4)</label>
+          <input id="ref" type="file" accept="video/mp4" />
+        </div>
+
+        <div>
+          <label class="lbl">پوشه ویدئوها (MP4)</label>
+          <input id="folder" type="file" accept="video/mp4" webkitdirectory multiple />
+          <small class="hint">مرورگر مسیر پوشه رو مستقیم نمی‌ده؛ فایل‌ها آپلود میشن.</small>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="run" class="btn">شروع پردازش</button>
+        <span id="status" class="status"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>چهره‌های پیدا شده در ویدئوی مرجع</h2>
+      <div id="refFaces" class="gallery"></div>
+    </section>
+
+    <section class="card">
+      <h2>نتایج مشابه (Match)</h2>
+      <div id="matches" class="gallery"></div>
+    </section>
+
+    <footer class="footer">
+      <span>پردازش روی CPU — خروجی‌ها در results ذخیره می‌شوند.</span>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
