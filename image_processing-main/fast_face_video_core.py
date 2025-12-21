@@ -1,15 +1,19 @@
-import os, json
+import os, json ,re,hashlib
 import numpy as np
 import cv2
+from insightface.app import FaceAnalysis
+from sklearn.cluster import DBSCAN
 
 
-SAMPLE_FPS = 4.0
-DET_SIZE = (640, 640)
-MIN_FACE_SIZE = 40
-DBSCAN_EPS = 0.32
+
+SAMPLE_FPS = 3.0
+DET_SIZE = (768, 768)
+MIN_FACE_SIZE = 36
+DBSCAN_EPS = 0.34
 DBSCAN_MIN_SAMPLES = 4
-MATCH_COS_SIM = 0.45
-CROP_MARGIN = 0.25
+MATCH_COS_SIM = 0.52
+CROP_MARGIN = 0.30
+
 
 def ensure_dir(p): os.makedirs(p, exist_ok=True)
 
@@ -20,6 +24,29 @@ def cosine_sim(a, b):
 
 def variance_of_laplacian(gray):
     return float(cv2.Laplacian(gray, cv2.CV_64F).var())
+#---------------------------------------------------------------------------------------------------------------------- 
+
+USER_RE = re.compile(r'^user_(\d+)_video_(\d+)$', re.IGNORECASE)
+
+def parse_userid(video_path: str) -> str:
+    base = os.path.splitext(os.path.basename(video_path))[0]
+    m = USER_RE.match(base)
+    if not m:
+        raise ValueError(f"Bad filename: {base}. Expected user_<id>_video_<n>.mp4")
+    return m.group(1)
+
+
+def fingerprint(video_path: str, head_mb: int = 8) -> dict:
+    st = os.stat(video_path)
+    h = hashlib.sha1()
+    with open(video_path, "rb") as f:
+        h.update(f.read(head_mb * 1024 * 1024)) 
+    return {
+        "size": int(st.st_size),
+        "mtime": int(st.st_mtime),
+        "head_sha1": h.hexdigest()
+    }
+#---------------------------------------------------------------------------------------------------------------------
 
 def clamp_bbox(x1, y1, x2, y2, w, h):
     x1 = max(0, min(int(x1), w - 1))
@@ -47,10 +74,9 @@ def quality_score(face_crop_bgr, det_score: float):
     sharp = variance_of_laplacian(gray)
     area_term = np.log(1 + area)
     sharp_term = np.log(1 + max(sharp, 0.0))
-    return 1.6 * float(det_score) + 0.8 * float(area_term) + 0.6 * float(sharp_term)
+    return  0.8 * float(area_term) + 0.6 * float(sharp_term)
 
 def build_face_analyzer():
-    from insightface.app import FaceAnalysis
     app = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
     app.prepare(ctx_id=-1, det_size=DET_SIZE)
     return app
@@ -79,8 +105,6 @@ def extract_faces(video_path, app):
             continue
         for f in faces:
             x1, y1, x2, y2 = f.bbox.astype(np.float32).tolist()
-            if min(x2-x1, y2-y1) < MIN_FACE_SIZE:
-                continue
             det_score = float(getattr(f, "det_score", 0.0))
             emb = np.array(f.embedding, dtype=np.float32)
             crop = crop_with_margin(frame, (x1, y1, x2, y2))
@@ -95,7 +119,6 @@ def extract_faces(video_path, app):
     return items
 
 def cluster_people(face_items):
-    from sklearn.cluster import DBSCAN
     if not face_items:
         return []
 
@@ -128,7 +151,7 @@ def save_people(video_tag, clusters, out_dir):
     ensure_dir(out_dir)
     people = []
     for i, (_, items) in enumerate(clusters, start=1):
-        pid = f"Person_{i:02d}"
+        pid = f"{i:02d}"
         pdir = os.path.join(out_dir, pid)
         ensure_dir(pdir)
 
